@@ -14,7 +14,10 @@ function bblSort(arr){
 
 const prompt = require("prompt-sync")(); 
 var seriesString = prompt("Enter the series to find the third largest element . eg. 1 2 4 5 ?");
-var series = seriesString.split(",")
+var series =  seriesString.split(",")
+for(var i=0;i>series.length;i++){
+series[i] = parseInt(series[i])
+}
 var series = bblSort(series)
 console.log("The third largest number is "+series[2])
 
