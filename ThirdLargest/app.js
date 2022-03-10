@@ -19,5 +19,5 @@ for(var i=0;i>series.length;i++){
 series[i] = parseInt(series[i])
 }
 var series = bblSort(series)
-console.log("The third largest number is "+series[2])
+console.log("The third largest number is "+series[series.length-2])
 
