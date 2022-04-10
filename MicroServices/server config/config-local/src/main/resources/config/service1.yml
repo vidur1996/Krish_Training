@@ -1,0 +1,3 @@
+service:
+  greeting: hello from spring config server 1
+  id: 12121
