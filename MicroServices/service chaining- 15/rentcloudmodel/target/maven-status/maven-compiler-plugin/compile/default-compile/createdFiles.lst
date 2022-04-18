@@ -1,0 +1,4 @@
+com\vidu\rentcloud\model\customer\Loyality.class
+com\vidu\rentcloud\model\customer\Customer.class
+com\vidu\rentcloud\model\vehicle\Vehicle.class
+com\vidu\rentcloud\model\rent\Rent.class
