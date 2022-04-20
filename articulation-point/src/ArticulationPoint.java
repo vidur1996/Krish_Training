@@ -1,106 +1,71 @@
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+
 
 public class ArticulationPoint {
-    private HashMap<String, Integer> lowerIndex;
-    private HashMap<String, Integer> depthIndex;
 
-    public HashMap<String, Integer> getDepth(List<String> dfs) {
-        HashMap<String, Integer> depth = new HashMap<>();
-        int index = 1;
-        for (String s : dfs) {
-            depth.put(s, index);
-            index++;
-        }
-        depthIndex = depth;
-        return depth;
+    static int time;
+
+    static void addEdge(ArrayList<ArrayList<Integer>> adj, int u, int v) {
+        adj.get(u).add(v);
+        adj.get(v).add(u);
     }
 
-    public HashMap<String, Integer> getLowestIndex(String[] backEdges,
-                                                   List<String> dfs,
-                                                   HashMap<String, Integer> depth,
-                                                   HashMap<String, Integer> verticent
-    ) {
-        HashMap<String, Integer> lower = new HashMap<>();
-        for (int i = 0; i < dfs.size(); i++) {
-            if (depth.get((dfs.get(i))) == 1) {
-                lower.put(dfs.get(i), 1);
-            } else {
-                int j = verticent.get(dfs.get(i));
-                for (int t = j; t < backEdges.length; t++) {
-                    if (backEdges[t] != null) {
-                        if (depth.get(backEdges[t]) != 9) {
-                            lower.put(dfs.get(i), depth.get(backEdges[t]));
-                            break;
-                        }
-                    }
+    static void APUtil(ArrayList<ArrayList<Integer>> adj, int u,
+                       boolean[] visited, int[] disc, int[] low,
+                       int parent, boolean[] isAP) {
 
-                }
-            }
+        int children = 0;
+        visited[u] = true;
+        disc[u] = low[u] = ++time;
+        for (Integer v : adj.get(u)) {
+
+            if (!visited[v]) {
+                children++;
+                APUtil(adj, v, visited, disc, low, u, isAP);
+                low[u] = Math.min(low[u], low[v]);
+
+                if (parent != -1 && low[v] >= disc[u])
+                    isAP[u] = true;
+            } else if (v != parent)
+                low[u] = Math.min(low[u], disc[v]);
         }
-        lowerIndex = lower;
-        return lower;
+
+        if (parent == -1 && children > 1)
+            isAP[u] = true;
     }
 
-    public String findArticulationPoint(String parent, String child) {
-        if (lowerIndex.get(child) >= depthIndex.get(parent)) {
-            return parent;
-        } else {
-            return null;
-        }
+    static void AP(ArrayList<ArrayList<Integer>> adj, int V) {
+        boolean[] visited = new boolean[V];
+        int[] disc = new int[V];
+        int[] low = new int[V];
+        boolean[] isAP = new boolean[V];
+        int time = 0, par = -1;
+
+        for (int u = 0; u < V; u++)
+            if (visited[u] == false)
+                APUtil(adj, u, visited, disc, low, par, isAP);
+        for (int u = 0; u < V; u++)
+            if (isAP[u] == true)
+                System.out.print(u + " ");
+        System.out.println();
     }
 
     public static void main(String[] args) {
-        Graph graph = new Graph(9);
-        ArticulationPoint articulationPoint = new ArticulationPoint();
-        List<String> articulationPointList = new ArrayList<String>();
+        int V = 8;
+        ArrayList<ArrayList<Integer>> adj1 =
+                new ArrayList<ArrayList<Integer>>(V);
+        for (int i = 0; i < V; i++)
+            adj1.add(new ArrayList<Integer>());
+        addEdge(adj1, 1, 3);
+        addEdge(adj1, 1, 2);
+        addEdge(adj1, 2, 3);
+        addEdge(adj1, 2, 4);
+        addEdge(adj1, 3, 5);
+        addEdge(adj1, 5, 7);
+        addEdge(adj1, 5, 6);
+        System.out.println("Articulation points in the graph are");
+        AP(adj1, V);
 
-        graph.addAdjacent(0, "A");
-        graph.addAdjacent(1, "D");
-        graph.addAdjacent(2, "C");
-        graph.addAdjacent(3, "B");
-        graph.addAdjacent(4, "E");
-        graph.addAdjacent(5, "F");
-        graph.addAdjacent(6, "G");
-        graph.addAdjacent(7, "H");
-        graph.addAdjacent(8, "I");
-
-        graph.addEdges(0, "D");
-        graph.addEdges(3, "C");
-        graph.addEdges(0, "B");
-        graph.addEdges(2, "E");
-        graph.addEdges(4, "F");
-        graph.addEdges(2, "F");
-        graph.addEdges(1, "C");
-        graph.addEdges(5, "G");
-        graph.addEdges(6, "H");
-        graph.addEdges(6, "I");
-        graph.addEdges(7, "I");
-
-        List<String> getDfs = graph.depthFirst("A");
-        String[] backEdges = graph.putBacktracking(getDfs);
-        HashMap<String, Integer> verticent = graph.getVerticents();
-        HashMap<String, Integer> depth = articulationPoint.getDepth(getDfs);
-        articulationPoint.getLowestIndex(backEdges, getDfs, depth, verticent);
-
-
-        String[][] checkPoints = {{"B", "C"},
-                {"C", "E"},{"C", "F"},
-                {"F", "G"},{"H", "G"},
-                {"H", "I"},{"G", "F"}};
-
-        for(int i=0;i<checkPoints.length;i++){
-            String temp = articulationPoint.findArticulationPoint(checkPoints[i][0],checkPoints[i][1]);
-            if (temp!=null){
-                if(!articulationPointList.contains(temp)) {
-                    articulationPointList.add(temp);
-                }
-            }
-        }
-
-        System.out.println("The articulation point for the graph are");
-        System.out.println(articulationPointList);
 
     }
 }
